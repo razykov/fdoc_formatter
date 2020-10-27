@@ -1,8 +1,10 @@
 #include <iostream>
+#include <QDateTime>
 #include <QTextCodec>
 #include "fdf_utils.h"
 
 #define ERROR_MESSAGE_WAIT_MS (15000)
+#define NOF_FIELDS            (68)
 
 typedef unsigned short u16;
 typedef unsigned int   u32;
@@ -17,77 +19,79 @@ enum tag_type {
     F_BOOL,
     F_UNXTM,
     F_FDS,
+    F_FFD,
     F_UNKWN
 };
 
-//23 04 \\ #1059 (unknown tag)
-//29 00 \\ (41)
-//06 04 0B 00 8F E0 AE A4 A0 A6 A0 20 FC 20 33 37 04 01 00 01 FF 03 02 00 03 01 13 04 01 00 00 BE 04 01 00 04 BC 04 01 00 01
-//FD 03 \\ #1021 (кассир)
-//17 00 \\ (23)
-//8A A0 E1 E1 A8 E0 3A 20 92 A5 E1 E2 AE A2 EB A9 20 8A A0 E1 E1 A8 E0 \\ "Кассир: Тестовый Кассир"
-//07 04 \\ #1031 (unknown tag)
-//01 00 \\ (1)
-//00
-//39 04 \\ #1081 (unknown tag)
-//01 00 \\ (1)
-//00
-//51 04 \\ #1105 (unknown tag)
-//01 00 \\ (1)
-//00
-//18 04 \\ #1048 (unknown tag)
-//0A 00 \\ (10)
-//43 69 6E 65 6D 61 50 6C 61 6E
-//F1 03 \\ #1009 (unknown tag)
-//0D 00 \\ (13)
-//47 72 69 73 68 69 6E 61 20 31 35 2F 31
-//1F 04 \\ #1055 (unknown tag)
-//01 00 \\ (1)
-//01
-//BF 04 \\ #1215 (unknown tag)
-//01 00 \\ (1)
-//00
-//C0 04 \\ #1216 (unknown tag)
-//01 00 \\ (1)
-//00
-//C1 04 \\ #1217 (unknown tag)
-//01 00 \\ (1)
-//00
-//24 04 \\ #1060 (unknown tag)
-//08 00 \\ (8)
-//6E 61 6C 6F 67 2E 72 75
-//A3 04 \\ #1187 (unknown tag)
-//04 00 \\ (4)
-//31 33 30 37
-
 enum tag {
-    TAG_DOC_DATE     = 1012,
-    TAG_TAXID        = 1018,
-    TAG_CASHER       = 1021,
-    TAG_ITEM_NAME    = 1030,
-    TAG_RN_KKT       = 1037,
-    TAG_SESSION      = 1038,
-    TAG_DOC_NUM      = 1040,
-    TAG_FN_SERIAL    = 1041,
-    TAG_FD_OF_SESSN  = 1042,
-    TAG_FN_TIMEOUT   = 1050,
-    TAG_FN_REPLACE   = 1051,
-    TAG_FN_MEM_FULL  = 1052,
-    TAG_FN_OFD_TMOUT = 1053,
-    TAG_METHOD       = 1054,
-    TAG_ITEM         = 1059,
-    TAG_FDS          = 1077,
-    TAG_CORR_REASON  = 1174,
-    TAG_CORR_NAME    = 1177,
-    TAG_CORR_DATE    = 1178,
-    TAG_CORR_DOC_NUM = 1179,
-    TAG_KKT_VER      = 1188,
-    TAG_KKT_FFD      = 1189,
-    TAG_NOF_NRESP_FD = 1097,
-    TAG_DATE_1FD_QUE = 1098,
-    TAG_NOF_FD       = 1111,
-    TAG_NOF_FSA      = 1118,
-    TAG_FFD          = 1209,
+    TG_AUTO_MODE    = 1001,
+    TG_AUTONOMUS    = 1002,
+    TG_ADDRESS      = 1009,
+    TG_DOC_DATE     = 1012,
+    TG_KKT_SN       = 1013,
+    TG_TAXID_OFD    = 1017,
+    TG_TAXID        = 1018,
+    TG_TOTAL        = 1020,
+    TG_CASHER       = 1021,
+    TG_ITEM_COUNT   = 1023,
+    TG_ITEM_NAME    = 1030,
+    TG_PAY_CASH     = 1031,
+    TG_RN_KKT       = 1037,
+    TG_SESSION      = 1038,
+    TG_DOC_NUM      = 1040,
+    TG_FN_SERIAL    = 1041,
+    TG_FD_OF_SESSN  = 1042,
+    TG_ITEM_PRICE   = 1043,
+    TG_OFD_NAME     = 1046,
+    TG_USER_NAME    = 1048,
+    TG_FN_TIMEOUT   = 1050,
+    TG_FN_REPLACE   = 1051,
+    TG_FN_MEM_FULL  = 1052,
+    TG_FN_OFD_TMOUT = 1053,
+    TG_RECEIPT_TYPE = 1054,
+    TG_TAX_SYS      = 1055,
+    TG_OFD_SECR     = 1056,
+    TG_AGENT        = 1057,
+    TG_ITEM         = 1059,
+    TG_FTD_URL      = 1060,
+    TG_TAXSYSTEMS   = 1062,
+    TG_FDS          = 1077,
+    TG_ITEM_1PRICE  = 1079,
+    TG_PAY_CASHLESS = 1081,
+    TG_NOF_NRESP_FD = 1097,
+    TG_DATE_1FD_QUE = 1098,
+    TG_SUM_20TAX    = 1102,
+    TG_SUM_10TAX    = 1103,
+    TG_SUM_0TAX     = 1104,
+    TG_SUM_NOTAX    = 1105,
+    TG_SUM_120TAX   = 1106,
+    TG_SUM_110TAX   = 1107,
+    TG_KKT_INTERNET = 1108,
+    TG_KKT4SERVICE  = 1109,
+    TG_AUTO_BSO     = 1110,
+    TG_NOF_FD       = 1111,
+    TG_OFD_EMAIL    = 1117,
+    TG_NOF_FSA      = 1118,
+    TG_IS_LOTTERY   = 1126,
+    TG_CORR_REASON  = 1174,
+    TG_CORR_NAME    = 1177,
+    TG_CORR_DATE    = 1178,
+    TG_CORR_DOC_NUM = 1179,
+    TG_TPLACE       = 1187,
+    TG_KKT_VER      = 1188,
+    TG_KKT_FFD      = 1189,
+    TG_FN_FFD       = 1190,
+    TG_IS_CASINO    = 1193,
+    TG_TAX          = 1199,
+    TG_ITEM_TAX     = 1200,
+    TG_IS_EXCISE    = 1207,
+    TG_FFD          = 1209,
+    TG_ITEM_TYPE    = 1212,
+    TG_METHOD       = 1214,
+    TG_PAY_ADVANCE  = 1215,
+    TG_PAY_CREDIT   = 1216,
+    TG_PAY_OTHER    = 1217,
+    TG_IN_AUTOMATIC = 1221
 };
 
 struct field {
@@ -96,41 +100,82 @@ struct field {
     const char * name;
 };
 
-struct field fields[27] {
-    { TAG_DOC_DATE,     F_UNXTM, "дата и время формирования ФД" },
-    { TAG_TAXID,        F_STR,   "ИНН пользователя" },
-    { TAG_CASHER,       F_STR,   "кассир" },
-    { TAG_ITEM_NAME,    F_STR,   "наименование предмета расчета" },
-    { TAG_RN_KKT,       F_STR,   "регистрационный номер ККТ" },
-    { TAG_SESSION,      F_INT,   "номер смены" },
-    { TAG_DOC_NUM,      F_INT,   "номер ФД" },
-    { TAG_FN_SERIAL,    F_STR,   "заводской номер фискального накопителя" },
-    { TAG_FD_OF_SESSN,  F_INT,   "номер чека за смену" },
-    { TAG_FN_TIMEOUT,   F_BOOL,  "признак исчерпания ресурса ФН" },
-    { TAG_FN_REPLACE,   F_BOOL,  "признак необходимости срочной замены ФН" },
-    { TAG_FN_MEM_FULL,  F_BOOL,  "признак заполнения памяти ФН" },
-    { TAG_FN_OFD_TMOUT, F_BOOL,  "признак превышения времени ожидания ответа ОФД" },
-    { TAG_METHOD,       F_INT,   "признак расчета" },
-    { TAG_ITEM,         F_STLV,  "предмет расчета" },
-    { TAG_FDS,          F_FDS,   "фискальный признак документа" },
-    { TAG_CORR_REASON,  F_STLV,  "основание для коррекции" },
-    { TAG_CORR_NAME,    F_STR,   "описание коррекции" },
-    { TAG_CORR_DATE,    F_UNXTM, "дата совершения корректируемого расчета" },
-    { TAG_CORR_DOC_NUM, F_STR,   "номер предписания налогового органа" },
-    { TAG_KKT_VER,      F_STR,   "версия ККТ" },
-    { TAG_KKT_FFD,      F_INT,   "версия ФФД ККТ" },
-    { TAG_NOF_NRESP_FD, F_INT,   "количество непереданных ФД" },
-    { TAG_DATE_1FD_QUE, F_UNXTM, "дата первого из непереданных ФД" },
-    { TAG_NOF_FD,       F_INT,   "общее количество ФД за смену" },
-    { TAG_NOF_FSA,      F_INT,   "количество кассовых чеков (БСО) за смену" },
-    { TAG_FFD,          F_INT,   "номер версии ФФД" },
+struct field fields[NOF_FIELDS] {
+    { TG_AUTO_MODE,    F_BOOL,  "признак автоматического режима" },
+    { TG_AUTONOMUS,    F_BOOL,  "признак автономного режима" },
+    { TG_ADDRESS,      F_STR,   "адрес расчетов" },
+    { TG_DOC_DATE,     F_UNXTM, "дата и время формирования ФД" },
+    { TG_KKT_SN,       F_STR,   "заводской номер ККТ" },
+    { TG_TAXID_OFD,    F_STR,   "ИНН ОФД" },
+    { TG_TAXID,        F_STR,   "ИНН пользователя" },
+    { TG_TOTAL,        F_INT,   "сумма расчета, указанного в чеке (БСО)" },
+    { TG_CASHER,       F_STR,   "кассир" },
+    { TG_ITEM_COUNT,   F_INT,   "количество предмета расчета" },
+    { TG_ITEM_NAME,    F_STR,   "наименование предмета расчета" },
+    { TG_PAY_CASH,     F_INT,   "сумма по чеку (БСО) наличными" },
+    { TG_RN_KKT,       F_STR,   "регистрационный номер ККТ" },
+    { TG_SESSION,      F_INT,   "номер смены" },
+    { TG_DOC_NUM,      F_INT,   "номер ФД" },
+    { TG_FN_SERIAL,    F_STR,   "заводской номер фискального накопителя" },
+    { TG_FD_OF_SESSN,  F_INT,   "номер чека за смену" },
+    { TG_ITEM_PRICE,   F_INT,   "стоимость предмета расчета с учетом скидок и наценок" },
+    { TG_OFD_NAME,     F_STR,   "наименование ОФД" },
+    { TG_USER_NAME,    F_STR,   "наименование пользователя" },
+    { TG_FN_TIMEOUT,   F_BOOL,  "признак исчерпания ресурса ФН" },
+    { TG_FN_REPLACE,   F_BOOL,  "признак необходимости срочной замены ФН" },
+    { TG_FN_MEM_FULL,  F_BOOL,  "признак заполнения памяти ФН" },
+    { TG_FN_OFD_TMOUT, F_BOOL,  "признак превышения времени ожидания ответа ОФД" },
+    { TG_RECEIPT_TYPE, F_INT,   "признак расчета" },
+    { TG_TAX_SYS,      F_INT,   "применяемая система налогообложения" },
+    { TG_OFD_SECR,     F_BOOL,  "признак передачи ФД ОФД в зашифрованном виде" },
+    { TG_AGENT,        F_INT,   "признак агента" },
+    { TG_ITEM,         F_STLV,  "предмет расчета" },
+    { TG_FTD_URL,      F_STR,   "адрес сайта ФНС" },
+    { TG_TAXSYSTEMS,   F_INT,   "системы налогообложения, которые пользователь может применять" },
+    { TG_FDS,          F_FDS,   "фискальный признак документа" },
+    { TG_ITEM_1PRICE,  F_INT,   "цена за единицу предмета расчета с учетом скидок и наценок" },
+    { TG_PAY_CASHLESS, F_INT,   "сумма по чеку (БСО) безналичными" },
+    { TG_SUM_20TAX,    F_INT,   "сумма НДС чека по ставке 20%" },
+    { TG_SUM_10TAX,    F_INT,   "сумма НДС чека по ставке 10%" },
+    { TG_SUM_0TAX,     F_INT,   "сумма НДС чека по ставке 0%" },
+    { TG_SUM_NOTAX,    F_INT,   "сумма расчета по чеку без НДС" },
+    { TG_SUM_120TAX,   F_INT,   "сумма НДС чека по ставке 20/120%" },
+    { TG_SUM_110TAX,   F_INT,   "сумма НДС чека по ставке 10/110%" },
+    { TG_KKT_INTERNET, F_BOOL,  "признак ККТ для расчетов только в Интернет" },
+    { TG_KKT4SERVICE,  F_BOOL,  "признак применения ККТ при оказании услуг" },
+    { TG_AUTO_BSO,     F_BOOL,  "признак ККТ, являющейся автоматизированной системой для БСО" },
+    { TG_NOF_FD,       F_INT,   "общее количество ФД за смену" },
+    { TG_OFD_EMAIL,    F_STR,   "адрес электронной почты отправителя чека" },
+    { TG_NOF_FSA,      F_INT,   "количество кассовых чеков (БСО) за смену" },
+    { TG_IS_LOTTERY,   F_BOOL,  "признак проведения лотереи" },
+    { TG_CORR_REASON,  F_STLV,  "основание для коррекции" },
+    { TG_CORR_NAME,    F_STR,   "описание коррекции" },
+    { TG_CORR_DATE,    F_UNXTM, "дата совершения корректируемого расчета" },
+    { TG_CORR_DOC_NUM, F_STR,   "номер предписания налогового органа" },
+    { TG_TPLACE,       F_STR,   "место расчетов" },
+    { TG_KKT_VER,      F_STR,   "версия ККТ" },
+    { TG_KKT_FFD,      F_FFD,   "версия ФФД ККТ" },
+    { TG_FN_FFD,       F_FFD,   "версия ФФД ФН" },
+    { TG_NOF_NRESP_FD, F_INT,   "количество непереданных ФД" },
+    { TG_DATE_1FD_QUE, F_UNXTM, "дата первого из непереданных ФД" },
+    { TG_IS_CASINO,    F_BOOL,  "признак проведения азартных игр" },
+    { TG_TAX,          F_INT,   "ставка НДС" },
+    { TG_ITEM_TAX,     F_INT,   "сумма НДС за предмет расчета" },
+    { TG_IS_EXCISE,    F_BOOL,  "признак торговли подакцизными товарами" },
+    { TG_FFD,          F_FFD,   "номер версии ФФД" },
+    { TG_ITEM_TYPE,    F_INT,   "признак предмета расчета" },
+    { TG_METHOD,       F_INT,   "признак способа расчета" },
+    { TG_PAY_ADVANCE,  F_INT,   "сумма по чеку (БСО) предоплатой" },
+    { TG_PAY_CREDIT,   F_INT,   "сумма по чеку (БСО) постоплатой (в кредит)" },
+    { TG_PAY_OTHER,    F_INT,   "сумма по чеку (БСО) встречным предоставлением" },
+    { TG_IN_AUTOMATIC, F_BOOL,  "признак установки принтера в автомате" },
 };
 
 static void _data_format(Ui::MainWindow *ui, QString *text, QByteArray *bts, u32 mux);
 
 static enum tag_type _ftype(u16 tag)
 {
-    for(u32 i = 0; i < sizeof(fields); ++i) {
+    for(u32 i = 0; i < NOF_FIELDS; ++i) {
         if(tag == fields[i].tag)
             return (enum tag_type)fields[i].type;
     }
@@ -139,7 +184,7 @@ static enum tag_type _ftype(u16 tag)
 
 static const char * _fname(u16 tag)
 {
-    for(u32 i = 0; i < sizeof(fields); ++i) {
+    for(u32 i = 0; i < NOF_FIELDS; ++i) {
         if(tag == fields[i].tag)
             return fields[i].name;
     }
@@ -183,15 +228,15 @@ static void _int_comment_print(QString * text, QByteArray * bts) {
 
     if (bts->size() == 1) {
         u8 *num = (u8 *)bts->data();
-        sprintf(buff, "\\\\ (=%d)", *num);
+        sprintf(buff, "(=%d)", *num);
     } else if (bts->size() == 2) {
         u16 *num = (u16 *)bts->data();
-        sprintf(buff, "\\\\ (=%d)", *num);
+        sprintf(buff, "(=%d)", *num);
     } else if (bts->size() == 4) {
         u32 *num = (u32 *)bts->data();
-        sprintf(buff, "\\\\ (=%d)", *num);
+        sprintf(buff, "(=%d)", *num);
     } else {
-        sprintf(buff, "\\\\ (<invalid int|%d|>)", bts->size());
+        sprintf(buff, "(<invalid int|%d|>)", bts->size());
     }
 
     text->append(buff);
@@ -200,41 +245,65 @@ static void _int_comment_print(QString * text, QByteArray * bts) {
 static void _str_comment_print(QString * text, QByteArray * bts) {
     char buff[4096];
     QTextCodec *codec = QTextCodec::codecForName("CP866");
-    sprintf(buff, "\\\\ \"%s\"",
+    sprintf(buff, "\"%s\"",
                   codec->toUnicode(*bts).toStdString().c_str());
     text->append(buff);
 }
 
-static void _unxtm_comment_print(QString * text, QByteArray * bts) {
+static void _unxtm_comment_print(QString * text, QByteArray * bts)
+{
     char buff[64];
+    QDateTime timestamp;
     u32 * unxtm = (u32 *)bts->data();
-    sprintf(buff, "\\\\ (%d sec)", *unxtm);
+
+    timestamp.setTime_t(*unxtm);
+    std::string str = timestamp.toString().toStdString();
+
+    sprintf(buff, "(%s)", str.c_str());
     text->append(buff);
 }
 
-static void _fds_print(QString * text, QByteArray * bts) {
+static void _fds_comment_print(QString * text, QByteArray * bts) {
     char buff[64];
     u16 * hz  = (u16 *)bts->data();
     u32 * fds = (u32 *)(bts->data() + 2);
-    sprintf(buff, "\\\\ (0x%04X =%d)", *hz, *fds);
+    sprintf(buff, "(0x%04X =%u)", *hz, *fds);
+    text->append(buff);
+}
+
+static const char * _ffd_name(u8 ffd) {
+    switch (ffd) {
+        case 0x00: return "1.0";
+        case 0x01: return "1.05";
+        case 0x02: return "1.1";
+    default:       return "unknown";
+    }
+}
+
+static void _ffd_comment_print(QString * text, QByteArray * bts) {
+    char buff[64];
+    sprintf(buff, "(ФФД %s)", _ffd_name(bts->at(0)));
     text->append(buff);
 }
 
 static void _bool_comment_print(QString * text, QByteArray * bts) {
     char buff[16];
     u8 * flag = (u8 *)bts->data();
-    sprintf(buff, "\\\\ \%s", *flag ? "true" : "false");
+    sprintf(buff, "\%s", *flag ? "true" : "false");
     text->append(buff);
 }
 
 static void _comment_print(QString * text, QByteArray * bts, u16 tag)
 {
+    text->append("\\\\ ");
+
     switch (_ftype(tag)) {
         case F_BOOL : _bool_comment_print (text, bts); break;
         case F_INT  : _int_comment_print  (text, bts); break;
         case F_STR  : _str_comment_print  (text, bts); break;
         case F_UNXTM: _unxtm_comment_print(text, bts); break;
-        case F_FDS  : _fds_print          (text, bts); break;
+        case F_FDS  : _fds_comment_print  (text, bts); break;
+        case F_FFD  : _ffd_comment_print  (text, bts); break;
     default:
         break;
     }
