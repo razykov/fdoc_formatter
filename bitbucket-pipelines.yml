@@ -10,6 +10,7 @@ pipelines:
       - step:
           name: 'Build and Test'
           script:
+            - apt update
             - echo "Your build and test goes here..."
             - cmake .
             - make
